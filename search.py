@@ -4,7 +4,7 @@ from pinecone import Pinecone
 
 pc = Pinecone(api_key="pcsk_5GNKLW_UXkcnZpG21PouoC5n7zhpefqKH8xaefi6k184m3kezNrcsP6XQuWxq1nX1qxRXe", environment="us-west1-gcp")
 
-index = pc.Index("news")
+index = pc.Index("week-2")
 
 # Uncomment the following line to see index stats
 #print(index.describe_index_stats())
