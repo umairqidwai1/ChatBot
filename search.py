@@ -1,8 +1,15 @@
+import os
+from dotenv import load_dotenv
 from pinecone import Pinecone
+from pinecone.openapi_support.exceptions import PineconeApiException
 
 # Run this code to search for the most relevant news articles based on user inputted query
 
-pc = Pinecone(api_key="pcsk_5GNKLW_UXkcnZpG21PouoC5n7zhpefqKH8xaefi6k184m3kezNrcsP6XQuWxq1nX1qxRXe", environment="us-west1-gcp")
+load_dotenv()  
+pc = Pinecone(
+    api_key=os.getenv("PINECONE_API_KEY"),
+    environment="us-west1-gcp"
+)
 
 index = pc.Index("week-2")
 
@@ -11,20 +18,26 @@ index = pc.Index("week-2")
 
 query = input("Enter your search query: ")
 
-embedding = pc.inference.embed(
-    model="multilingual-e5-large",
-    inputs=[query],
-    parameters={
-        "input_type": "query"
-    }
-)
+try:
+    embedding = pc.inference.embed(
+        model="multilingual-e5-large",
+        inputs=[query],
+        parameters={"input_type": "query"}
+    )
+except PineconeApiException as e:
+    print(f"Pinecone embed error: {e}")
+    exit(1)
 
-results = index.query(
-    namespace="ns1",
-    vector=embedding[0].values,
-    top_k=3,
-    include_values=False,
-    include_metadata=True
-)
+try: 
+    results = index.query(
+        namespace="ns1",
+        vector=embedding[0].values,
+        top_k=3,
+        include_values=False,
+        include_metadata=True
+    )
+except PineconeApiException as e:
+    print(f"Pinecone query error: {e}")
+    exit(1)
 
 print(results)
