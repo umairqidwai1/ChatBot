@@ -2,35 +2,37 @@ import os
 import time
 from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from pinecone.openapi_support.exceptions import PineconeApiException
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
 
 # Only need to run this once (already ran this no need to run again)
 
-# Initialize client
 load_dotenv()  
+
+# Initialize client
 pc = Pinecone(
     api_key=os.getenv("PINECONE_API_KEY"),
     environment="us-west1-gcp"
 )
 index_name = "week-2"
 
-existing = pc.list_indexes()
-if index_name not in existing:
+try:
     pc.create_index(
         name=index_name,
         dimension=1024,
         metric="cosine",
         spec=ServerlessSpec(cloud="aws", region="us-east-1")
     )
-else:
-    print(f"Index {index_name} already exists.")
 
-while not pc.describe_index(index_name).status["ready"]:
-    time.sleep(1)
-    
-index = pc.Index(index_name)
+    while not pc.describe_index(index_name).status["ready"]:
+        time.sleep(1)
+
+    index = pc.Index(index_name)
+except (PineconeApiException, Exception) as e:
+    print(f"Index {index_name} already exists.")
+    os._exit(1)
+
 
 # Load documents from the specified directory
 loader = DirectoryLoader(
@@ -76,6 +78,7 @@ try:
     print(embeddings[0])
 except PineconeApiException as e:
     print(f"Pinecone embed error: {e}")
+    os._exit(1)
 
 # Build the vectors to upsert
 vectors = []
@@ -97,3 +100,4 @@ try:
     print(index.describe_index_stats())
 except PineconeApiException as e:
     print(f"Pinecone upsert error: {e}")
+    os._exit(1)
