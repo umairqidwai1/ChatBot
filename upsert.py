@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -7,6 +8,13 @@ from pinecone.openapi_support.exceptions import PineconeApiException
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 
 # Only need to run this once (already ran this no need to run again)
+
+# Setup logging
+logging.basicConfig(
+    filename="logs/upsert.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 load_dotenv()  
 
@@ -30,7 +38,7 @@ try:
 
     index = pc.Index(index_name)
 except (PineconeApiException, Exception) as e:
-    print(f"Index {index_name} already exists.")
+    logging.error(f"Index {index_name} already exists.")
     os._exit(1)
 
 
@@ -53,7 +61,7 @@ splitter = RecursiveCharacterTextSplitter(
 )
 chunks = splitter.split_documents(docs)
 
-print(f"Total chunks: {len(chunks)}")
+logging.info(f"Total chunks: {len(chunks)}")
 
 data = [
     {"id": str(i), "text": chunk.page_content}
@@ -75,9 +83,9 @@ try:
         )
         embeddings.extend(embedding)
 
-    print(embeddings[0])
+    logging.info(embeddings[0])
 except PineconeApiException as e:
-    print(f"Pinecone embed error: {e}")
+    logging.error(f"Pinecone embed error: {e}")
     os._exit(1)
 
 # Build the vectors to upsert
@@ -95,9 +103,9 @@ try:
     for start in range(0, len(vectors), UPSERT_BATCH_SIZE):
         batch = vectors[start : start + UPSERT_BATCH_SIZE]
         index.upsert(vectors=batch, namespace="ns1")
-        print(f"Upserted vectors {start + 1}–{start + len(batch)}")
+        logging.info(f"Upserted vectors {start + 1}–{start + len(batch)}")
 
-    print(index.describe_index_stats())
+    logging.info(index.describe_index_stats())
 except PineconeApiException as e:
-    print(f"Pinecone upsert error: {e}")
+    logging.error(f"Pinecone upsert error: {e}")
     os._exit(1)
