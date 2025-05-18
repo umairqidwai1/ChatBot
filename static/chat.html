@@ -147,8 +147,9 @@
   <script>
     const chat = document.getElementById("chat");
     const input = document.getElementById("messageInput");
-    const sessionId = localStorage.getItem("sessionId") || crypto.randomUUID();
-    localStorage.setItem("sessionId", sessionId);
+    // Create a unique session ID every time the page loads
+    const sessionId = crypto.randomUUID();
+
 
     input.addEventListener("keypress", function (e) {
       if (e.key === "Enter") sendMessage();

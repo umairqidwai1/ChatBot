@@ -6,8 +6,15 @@ from pinecone import Pinecone
 from typing import List, Tuple
 from dotenv import load_dotenv
 from pinecone.openapi_support.exceptions import PineconeApiException
+# Guardrails + Presidio imports
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
 
 load_dotenv()
+
+# Presidio setup
+analyzer = AnalyzerEngine()
+anonymizer = AnonymizerEngine()
 
 # Setup logging
 os.makedirs("logs", exist_ok=True)
@@ -19,8 +26,12 @@ logging.basicConfig(
 
 MAX_HISTORY = 5
 SESSION_FILE = "sessions.csv"
-if not os.path.exists(SESSION_FILE):
-    open(SESSION_FILE, "w", encoding="utf-8").close()
+# Initialize session file if it doesn't exist and add header
+if not os.path.exists(SESSION_FILE) or os.stat(SESSION_FILE).st_size == 0:
+    with open(SESSION_FILE, mode="w", newline='', encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["session_id", "question", "context", "answer"])
+
 
 # Initialize clients
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -32,6 +43,16 @@ index = pc.Index("week-2")
 
 # Uncomment the following line to see index stats
 #print(index.describe_index_stats())
+
+# Function to detect PII in text
+def detect_pii_entities(text: str):
+    return analyzer.analyze(text, language='en')
+
+# Function to anonymize text
+def anonymize_text(text: str) -> str:
+    entities = detect_pii_entities(text)
+    result = anonymizer.anonymize(text=text, analyzer_results=entities)
+    return result.text
 
 # Function to embed the query
 def embed_query(query: str) -> List[float]:
@@ -63,13 +84,17 @@ def search_pinecone(embedding: List[float], top_k: int = 3) -> List[str]:
 
 # Fuction called by api.py to answer user queries
 def answer_query(query: str, session_id: str) -> str:
+    # Run PII detection before continuing (anonymize text)
+    query = anonymize_text(query)
+
     # Load history and build context
     history = load_session_history(session_id)
     history_str = "\n\n".join([
         f"Question: {question}\n\nContext: {context}\n\nAnswer: {answer}" 
         for question, context, answer in history
     ]) or "No prior chat history."
-    logging.info(f"History context: {history_str}")
+    # For debugging purposes, can remove later
+    # logging.info(f"History context: {history_str}")
 
     # Embed the query
     embedding = embed_query(query)
@@ -145,6 +170,7 @@ def load_session_history(session_id: str) -> List[Tuple[str, str, str]]:
     session_history = []
     with open(SESSION_FILE, newline='', encoding='utf-8') as f:
         reader = csv.reader(f)
+        next(reader, None)  # Skip header row
         for row in reader:
             if len(row) == 4:
                 row_session_id, question, context, answer = row
@@ -156,11 +182,13 @@ def load_session_history(session_id: str) -> List[Tuple[str, str, str]]:
 
 def save_session_history(session_id: str, history: List[Tuple[str, str, str]]):
     existing_rows = []
+    header = ["session_id", "question", "context", "answer"]
     
     # Load all existing data except for the current session
     if os.path.exists(SESSION_FILE):
         with open(SESSION_FILE, newline='', encoding='utf-8') as f:
             reader = csv.reader(f)
+            next(reader, None)  # Skip header
             for row in reader:
                 if len(row) == 4 and row[0] != session_id:
                     existing_rows.append(row)
@@ -174,6 +202,7 @@ def save_session_history(session_id: str, history: List[Tuple[str, str, str]]):
     # Write combined data back to file
     with open(SESSION_FILE, mode="w", newline='', encoding="utf-8") as f:
         writer = csv.writer(f)
+        writer.writerow(header)
         writer.writerows(existing_rows + session_rows)
 
 
