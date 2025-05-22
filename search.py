@@ -1,14 +1,15 @@
 import os
 import csv
+import duckdb
 import logging
+import pandas as pd
 from openai import OpenAI
 from pinecone import Pinecone
 from typing import List, Tuple
 from dotenv import load_dotenv
-from pinecone.openapi_support.exceptions import PineconeApiException
-# Guardrails + Presidio imports
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
+from pinecone.openapi_support.exceptions import PineconeApiException
 
 load_dotenv()
 
@@ -40,9 +41,6 @@ pc = Pinecone(
     environment="us-west1-gcp"
 )
 index = pc.Index("week-2")
-
-# Uncomment the following line to see index stats
-#print(index.describe_index_stats())
 
 # Function to detect PII in text
 def detect_pii_entities(text: str):
@@ -82,7 +80,7 @@ def search_pinecone(embedding: List[float], top_k: int = 3) -> List[str]:
         logging.error(f"Pinecone query error: {e}")
         return []
 
-# Fuction called by api.py to answer user queries
+# Fuction called by api.py to answer user text queries
 def answer_query(query: str, session_id: str) -> str:
     # Run PII detection before continuing (anonymize text)
     query = anonymize_text(query)
@@ -153,7 +151,7 @@ User's question:
         )
         answer = chat.choices[0].message.content
     except Exception as e:
-        logging.error(f"OpenAI API error: {e}")
+        logging.error(f"OpenAI text query error: {e}")
         return "Sorry, I couldn't process your request... (Backend Error - LLM)"
     
     # Append to history and trim to last 10
@@ -162,6 +160,82 @@ User's question:
     save_session_history(session_id, history)
 
     return answer
+
+# Fuction called by api.py to answer user CSV queries
+def answer_csv_query(query: str, df: pd.DataFrame) -> str:
+
+    # 1. Ask LLM for the SQL query
+    sql_prompt = f"""
+You are an expert data analyst. Based on the following CSV data sample, generate a SQL query to answer the user's question.
+
+CSV Data (first 5 rows):
+{df.head(5).to_csv(index=False)}
+
+---
+
+User question:
+{query}
+
+Respond ONLY with the SQL query.
+"""
+    
+    try:
+        chat_sql = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": """You are a SQL expert. 
+                 - Respond ONLY with the SQL query, do NOT use code blocks or markdown formatting.
+                 - Do not include any other text or comments.
+                 - The table name is always df. Do not use any other table name.
+                 - Always return at least a 1-sentence summary, even if the data is repetitive or blank.
+                 - If the user's question is not about the data, respond with: "I'm sorry, I can only answer questions about the provided data."""},
+                {"role": "user", "content": sql_prompt}
+            ],
+            temperature=0.3
+        )
+        sql_query = chat_sql.choices[0].message.content.strip()
+        logging.info(f"SQL query: {sql_query}")
+    except Exception as e:
+        logging.error(f"OpenAI CSV query error: {e}")
+        return "Sorry, I couldn't process your request... (CSV LLM Error - SQL Query)"
+
+    # 2. Execute the SQL query
+    try:
+        duckdb.register('df', df)
+        result = duckdb.sql(sql_query).to_df()
+        duckdb.unregister('df')
+        logging.info(f"Result: {result}")
+    except Exception as e:
+        logging.error(f"SQL execution error: {e}")
+        return f"Sorry, there was an error executing the generated SQL query: {str(e)}\n\nThe SQL was:\n{sql_query}"
+
+    # 3. Summarize the result (send back to LLM for explanation)
+    result_sample = result.head(5).to_csv(index=False) if not result.empty else "No rows returned."
+    summarize_prompt = f"""
+User question:
+"{query}"
+
+Here is a summary of the sql query results (first 5 rows):
+{result_sample}
+
+Please provide a short, clear, and human-readable answer based on the result. If the result is a table, summarize what it shows.
+"""
+    try:
+        chat_summary = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a data assistant. Summarize results from a CSV/SQL query for a user, briefly and clearly."},
+                {"role": "user", "content": summarize_prompt}
+            ],
+            temperature=0.3
+        )
+        summary = chat_summary.choices[0].message.content.strip()
+    except Exception as e:
+        logging.error(f"OpenAI CSV result summary error: {e}")
+        return f"Sorry, I couldn't process your request... (CSV LLM Error - Result Summary)"
+    
+    return summary
+
 
 def load_session_history(session_id: str) -> List[Tuple[str, str, str]]:
     if not os.path.exists(SESSION_FILE):

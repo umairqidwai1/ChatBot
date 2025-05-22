@@ -1,10 +1,11 @@
 import os
-from fastapi import FastAPI, HTTPException, Depends, Security, Request, Header
-from fastapi.security.api_key import APIKeyHeader
+import pandas as pd
 from pydantic import BaseModel
-from search import answer_query
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.security.api_key import APIKeyHeader
+from search import answer_query, answer_csv_query
+from fastapi import FastAPI, HTTPException, Depends, Security, Request, Header, File, UploadFile, Form
 
 app = FastAPI()
 
@@ -29,6 +30,7 @@ Expected Response:
     "answer": "string"
 }
 """
+# Chat endpoint
 @app.post("/chat", response_model=AnswerResponse, dependencies=[Depends(get_api_key)])
 async def chat(
     request: Request, 
@@ -46,6 +48,21 @@ async def chat(
         answer = answer_query(user_query.query, session_id)
     except Exception as e:
         raise HTTPException(500, f"Error processing query: {str(e)}")
+
+    return AnswerResponse(answer=answer)
+
+# CSV query endpoint
+@app.post("/csv-query", response_model=AnswerResponse, dependencies=[Depends(get_api_key)])
+async def csv_query(
+    request: Request,
+    query: str = Form(...),
+    file: UploadFile = File(...),
+):
+    try:
+        df = pd.read_csv(file.file)
+        answer = answer_csv_query(query, df)
+    except Exception as e:
+        raise HTTPException(500, f"Error processing CSV query: {str(e)}")
 
     return AnswerResponse(answer=answer)
 
