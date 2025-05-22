@@ -9,6 +9,10 @@ from fastapi import FastAPI, HTTPException, Depends, Security, Request, Header, 
 
 app = FastAPI()
 
+# Setup saving csv file in folder
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 API_KEY = os.getenv("CHAT_API_KEY")
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
@@ -56,10 +60,20 @@ async def chat(
 async def csv_query(
     request: Request,
     query: str = Form(...),
-    file: UploadFile = File(...),
+    file: UploadFile = File(None),
+    session_id: str = Header(..., alias="Session-ID"),
 ):
     try:
-        df = pd.read_csv(file.file)
+        session_csv_path = os.path.join(UPLOAD_FOLDER, f"{session_id}.csv")
+        # 1. If a file is uploaded, save it for this session
+        if file is not None and file.filename:
+            with open(session_csv_path, "wb") as f_out:
+                content = await file.read()
+                f_out.write(content)
+        # 2. If file not provided now, look for session's saved csv
+        if not os.path.exists(session_csv_path):
+            raise HTTPException(400, "No CSV file found for this session. Please upload one.")
+        df = pd.read_csv(session_csv_path)
         answer = answer_csv_query(query, df)
     except Exception as e:
         raise HTTPException(500, f"Error processing CSV query: {str(e)}")

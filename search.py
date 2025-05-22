@@ -127,7 +127,7 @@ User's question:
     try:
         chat = client.chat.completions.create(
 
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system", 
@@ -181,7 +181,7 @@ Respond ONLY with the SQL query.
     
     try:
         chat_sql = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": """You are a SQL expert. 
                  - Respond ONLY with the SQL query, do NOT use code blocks or markdown formatting.
@@ -222,7 +222,7 @@ Please provide a short, clear, and human-readable answer based on the result. If
 """
     try:
         chat_summary = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a data assistant. Summarize results from a CSV/SQL query for a user, briefly and clearly."},
                 {"role": "user", "content": summarize_prompt}

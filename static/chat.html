@@ -159,16 +159,14 @@
         color: #333;
       ">
         <span id="fileNameDisplay"></span>
-        <button onclick="removeAttachedFile()" style="
-          margin-left: 8px;
-          background: none;
-          border: none;
-          color: #666;
-          font-size: 14px;
-          cursor: pointer;
-        " title="Remove file">&times;</button>
       </div>
-    </div>    
+    </div>
+    <div style="padding: 10px 16px;">
+      <label style="font-weight:500;">
+        <input type="checkbox" id="csvModeToggle" style="vertical-align:middle; margin-right:8px;">
+        CSV Chat Mode
+      </label>
+    </div>
     <div class="chat-input">
       <input type="file" id="csvFile" style="display: none;" />
       <label for="csvFile" class="file-upload-icon"><i class="fas fa-paperclip"></i></label>
@@ -211,6 +209,10 @@
       const message = input.value.trim();
       if (!message) return;
 
+      const csvMode = document.getElementById("csvModeToggle").checked;
+      const fileInput = document.getElementById("csvFile");
+
+      // User message UI
       const userMsg = document.createElement("div");
       userMsg.className = "chat-message user";
       userMsg.innerHTML = `
@@ -221,6 +223,7 @@
       input.value = "";
       chat.scrollTop = chat.scrollHeight;
 
+      // Loading animation
       const loadingMsg = document.createElement("div");
       loadingMsg.className = "chat-message bot";
       loadingMsg.id = "loadingMsg";
@@ -234,15 +237,15 @@
       chat.scrollTop = chat.scrollHeight;
 
       try {
-        const fileInput = document.getElementById("csvFile");
-
         let response;
 
-        if (fileInput.files.length > 0) {
+        if (csvMode) {
+          // Only include file if user just uploaded
           const formData = new FormData();
           formData.append("query", message);
-          formData.append("file", fileInput.files[0]);
-
+          if (fileInput.files.length > 0) {
+            formData.append("file", fileInput.files[0]);
+          }
           response = await fetch("/csv-query", {
             method: "POST",
             headers: {
@@ -251,7 +254,6 @@
             },
             body: formData
           });
-
         } else {
           response = await fetch("/chat", {
             method: "POST",
@@ -267,11 +269,21 @@
         const data = await response.json();
         loadingMsg.remove();
 
+        let answer;
+        if (response.ok) {
+          answer = data.answer;
+        } else if (data && data.detail) {
+          // FastAPI returns { "detail": "your message" } on error
+          answer = data.detail;
+        } else {
+          answer = "Something went wrong. Please try again.";
+        }
+
         const botMsg = document.createElement("div");
         botMsg.className = "chat-message bot";
         botMsg.innerHTML = `
           <div class="avatar"><i class="fas fa-robot"></i></div>
-          <div class="chat-bubble">${marked.parse(data.answer || "Error: No response")}</div>
+          <div class="chat-bubble">${marked.parse(answer)}</div>
         `;
         chat.appendChild(botMsg);
         chat.scrollTop = chat.scrollHeight;
