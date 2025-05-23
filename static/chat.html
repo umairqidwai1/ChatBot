@@ -161,14 +161,8 @@
         <span id="fileNameDisplay"></span>
       </div>
     </div>
-    <div style="padding: 10px 16px;">
-      <label style="font-weight:500;">
-        <input type="checkbox" id="csvModeToggle" style="vertical-align:middle; margin-right:8px;">
-        CSV Chat Mode
-      </label>
-    </div>
     <div class="chat-input">
-      <input type="file" id="csvFile" style="display: none;" />
+      <input type="file" id="csvFile" accept=".csv,text/csv" style="display: none;" />
       <label for="csvFile" class="file-upload-icon"><i class="fas fa-paperclip"></i></label>
       <span id="fileNameDisplay" style="font-size: 12px; color: #555; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
       <input type="text" id="messageInput" placeholder="Type your message..." />
@@ -209,7 +203,6 @@
       const message = input.value.trim();
       if (!message) return;
 
-      const csvMode = document.getElementById("csvModeToggle").checked;
       const fileInput = document.getElementById("csvFile");
 
       // User message UI
@@ -239,13 +232,10 @@
       try {
         let response;
 
-        if (csvMode) {
-          // Only include file if user just uploaded
+        if (fileInput.files.length > 0) {
           const formData = new FormData();
           formData.append("query", message);
-          if (fileInput.files.length > 0) {
-            formData.append("file", fileInput.files[0]);
-          }
+          formData.append("file", fileInput.files[0]);
           response = await fetch("/csv-query", {
             method: "POST",
             headers: {
@@ -273,7 +263,6 @@
         if (response.ok) {
           answer = data.answer;
         } else if (data && data.detail) {
-          // FastAPI returns { "detail": "your message" } on error
           answer = data.detail;
         } else {
           answer = "Something went wrong. Please try again.";
