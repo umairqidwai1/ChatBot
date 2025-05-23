@@ -91,8 +91,6 @@ def answer_query(query: str, session_id: str) -> str:
         f"Question: {question}\n\nContext: {context}\n\nAnswer: {answer}" 
         for question, context, answer in history
     ]) or "No prior chat history."
-    # For debugging purposes, can remove later
-    # logging.info(f"History context: {history_str}")
 
     # Embed the query
     embedding = embed_query(query)
@@ -133,11 +131,11 @@ User's question:
                     "role": "system", 
                     "content": """You are AssetSonar's helpful AI assistant.
 
-                    - Only answer based on the provided context and question.
+                    - Answer based on the provided context and question.
                     - Do not make up information.
                     - If context clearly contains the answer, respond accurately.
-                    - If the answer isn't found in the context, but it's likely based on history or common AssetSonar knowledge, respond cautiously and state your answer.
-                    - For off-topic questions (not about AssetSonar), respond with: “Sorry, I can only help with AssetSonar-related qeustions.”
+                    - If the answer isn't found in the context, but its still on topic, it's likely based on history or common AssetSonar knowledge, respond with "Based on the information provided,...".
+                    - For completely off-topic questions (not about AssetSonar), respond with: “Sorry, I can only help with AssetSonar-related questions.”
                     - Be helpful, brief, and clear at all times, and format you answer in markdown format.
                     - You can answer general questions (eg: greetings) in a friendly manner."""
                 },
@@ -194,7 +192,6 @@ Respond ONLY with the SQL query.
             temperature=0.3
         )
         sql_query = chat_sql.choices[0].message.content.strip()
-        logging.info(f"SQL query: {sql_query}")
     except Exception as e:
         logging.error(f"OpenAI CSV query error: {e}")
         return "Sorry, I couldn't process your request... (CSV LLM Error - SQL Query)"
@@ -204,7 +201,6 @@ Respond ONLY with the SQL query.
         duckdb.register('df', df)
         result = duckdb.sql(sql_query).to_df()
         duckdb.unregister('df')
-        logging.info(f"Result: {result}")
     except Exception as e:
         logging.error(f"SQL execution error: {e}")
         return f"Sorry, there was an error executing the generated SQL query: {str(e)}\n\nThe SQL was:\n{sql_query}"
