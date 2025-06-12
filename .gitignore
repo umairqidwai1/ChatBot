@@ -1,4 +1,10 @@
+```gitignore
+# Virtualenv
 venv/
+# Byte-code
 __pycache__/
 *.pyc
-.env/
+# Environment files
+.env
+.env.*
+*.env
