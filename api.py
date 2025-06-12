@@ -55,31 +55,6 @@ async def chat(
 
     return AnswerResponse(answer=answer)
 
-# CSV query endpoint
-@app.post("/csv-query", response_model=AnswerResponse, dependencies=[Depends(get_api_key)])
-async def csv_query(
-    request: Request,
-    query: str = Form(...),
-    file: UploadFile = File(None),
-    session_id: str = Header(..., alias="Session-ID"),
-):
-    try:
-        session_csv_path = os.path.join(UPLOAD_FOLDER, f"{session_id}.csv")
-        # 1. If a file is uploaded, save it for this session
-        if file is not None and file.filename:
-            with open(session_csv_path, "wb") as f_out:
-                content = await file.read()
-                f_out.write(content)
-        # 2. If file not provided now, look for session's saved csv
-        if not os.path.exists(session_csv_path):
-            raise HTTPException(400, "No CSV file found for this session. Please upload one.")
-        df = pd.read_csv(session_csv_path)
-        answer = answer_csv_query(query, df)
-    except Exception as e:
-        raise HTTPException(500, f"Error processing CSV query: {str(e)}")
-
-    return AnswerResponse(answer=answer)
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)

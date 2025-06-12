@@ -1,8 +1,10 @@
 import os
+import re
 import csv
 import duckdb
 import logging
 import pandas as pd
+import openai
 from openai import OpenAI
 from pinecone import Pinecone
 from typing import List, Tuple
@@ -38,13 +40,23 @@ if not os.path.exists(SESSION_FILE) or os.stat(SESSION_FILE).st_size == 0:
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 pc = Pinecone(
     api_key=os.getenv("PINECONE_API_KEY"),
-    environment="us-west1-gcp"
+    environment="us-east-1"
 )
-index = pc.Index("week-2")
+index = pc.Index("yq1-transcripts")
 
 # Function to detect PII in text
 def detect_pii_entities(text: str):
     return analyzer.analyze(text, language='en')
+
+# Function to extract start seconds from text
+def extract_start_sec(text: str) -> int:
+    match = re.search(r"\[\s*([0-9.]+)\s*–", text)
+    if match:
+        try:
+            return int(float(match.group(1)))
+        except:
+            return 0
+    return 0
 
 # Function to anonymize text
 def anonymize_text(text: str) -> str:
@@ -55,18 +67,17 @@ def anonymize_text(text: str) -> str:
 # Function to embed the query
 def embed_query(query: str) -> List[float]:
     try:
-        embedding = pc.inference.embed(
-            model="multilingual-e5-large",
-            inputs=[query],
-            parameters={"input_type": "query"}
+        response = openai.embeddings.create(
+            model="text-embedding-3-large",
+            input=[query]
         )
-        return embedding[0].values
+        return response.data[0].embedding
     except PineconeApiException as e:
         logging.error(f"Pinecone embed error: {e}")
         return None
     
 # Function to query Pinecone index
-def search_pinecone(embedding: List[float], top_k: int = 3) -> List[str]:
+def search_pinecone(embedding: List[float], top_k: int = 3) -> List[dict]:
     try:
         results = index.query(
             namespace="ns1",
@@ -75,7 +86,8 @@ def search_pinecone(embedding: List[float], top_k: int = 3) -> List[str]:
             include_values=False,
             include_metadata=True
         )
-        return [match["metadata"]["text"] for match in results.get("matches", [])]
+        return [match["metadata"] for match in results.get("matches", [])]
+
     except PineconeApiException as e:
         logging.error(f"Pinecone query error: {e}")
         return []
@@ -103,9 +115,17 @@ def answer_query(query: str, session_id: str) -> str:
         return "Sorry, I couldn't process your request... (Backend Error - Search Pinecone)"
 
     # Build context from pinecone results
-    context = "\n\n---\n\n".join(pinecone_results)
-    
-    final_user_prompt = f"""You are an assistant for AssetSonar. Based on the following conversation history and provided context, answer the user's latest question.
+    context = "\n\n---\n\n".join([r.get("text", "") for r in pinecone_results])
+    sources = []
+    for r in pinecone_results:
+        link = r.get("Link")
+        text = r.get("text", "")
+        if link:
+            start_sec = extract_start_sec(text)
+            sources.append(f"[Watch here]({link}&t={start_sec})")
+
+
+    final_user_prompt = f"""You are an assistant for Islamic content that uses Shaykh Dr. Yasir Qadhi's videos. Based on the following conversation history and provided context, answer the user's latest question.
 
 Conversation history:
 {history_str}
@@ -128,16 +148,15 @@ User's question:
             model="gpt-4o-mini",
             messages=[
                 {
-                    "role": "system", 
-                    "content": """You are AssetSonar's helpful AI assistant.
+                    "role":"system",
+                    "content":"""
+                        You are an Islamic Assistant that uses Shaykh Dr. Yasir Qadhi's videos to answer questions.
 
-                    - Answer based on the provided context and question.
-                    - Do not make up information.
-                    - If context clearly contains the answer, respond accurately.
-                    - If the answer isn't found in the context, but its still on topic, it's likely based on history or common AssetSonar knowledge, respond with "Based on the information provided,...".
-                    - For completely off-topic questions (not about AssetSonar), respond with: “Sorry, I can only help with AssetSonar-related questions.”
-                    - Be helpful, brief, and clear at all times, and format you answer in markdown format.
-                    - You can answer general questions (eg: greetings) in a friendly manner."""
+                        • Base every answer **only** on the transcript context provided.  
+                        • If context does not answer the question, say “I'm not certain from these transcripts.”  
+                        • If the question is off-topic, reply: “Sorry, I can only help with questions about Shaykh Yasir Qadhi's videos.”  
+                        • Be concise, respectful, and format in Markdown.  
+                        """
                 },
                 {
                     "role": "user", 
@@ -157,81 +176,10 @@ User's question:
     history = history[-MAX_HISTORY:]
     save_session_history(session_id, history)
 
+    if sources:
+        answer += "\n\n**Sources:**\n" + "\n".join(f"- {link}" for link in sources)
+
     return answer
-
-# Fuction called by api.py to answer user CSV queries
-def answer_csv_query(query: str, df: pd.DataFrame) -> str:
-
-    # 1. Ask LLM for the SQL query
-    sql_prompt = f"""
-You are an expert data analyst. Based on the following CSV data sample, generate a SQL query to answer the user's question.
-
-CSV Data (first 5 rows):
-{df.head(5).to_csv(index=False)}
-
----
-
-User question:
-{query}
-
-Respond ONLY with the SQL query.
-"""
-    
-    try:
-        chat_sql = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": """You are a SQL expert. 
-                 - Respond ONLY with the SQL query, do NOT use code blocks or markdown formatting.
-                 - Do not include any other text or comments.
-                 - The table name is always df. Do not use any other table name.
-                 - Always return at least a 1-sentence summary, even if the data is repetitive or blank.
-                 - If the user's question is not about the data, respond with: "I'm sorry, I can only answer questions about the provided data."""},
-                {"role": "user", "content": sql_prompt}
-            ],
-            temperature=0.3
-        )
-        sql_query = chat_sql.choices[0].message.content.strip()
-    except Exception as e:
-        logging.error(f"OpenAI CSV query error: {e}")
-        return "Sorry, I couldn't process your request... (CSV LLM Error - SQL Query)"
-
-    # 2. Execute the SQL query
-    try:
-        duckdb.register('df', df)
-        result = duckdb.sql(sql_query).to_df()
-        duckdb.unregister('df')
-    except Exception as e:
-        logging.error(f"SQL execution error: {e}")
-        return f"Sorry, there was an error executing the generated SQL query: {str(e)}\n\nThe SQL was:\n{sql_query}"
-
-    # 3. Summarize the result (send back to LLM for explanation)
-    result_sample = result.head(5).to_csv(index=False) if not result.empty else "No rows returned."
-    summarize_prompt = f"""
-User question:
-"{query}"
-
-Here is a summary of the sql query results (first 5 rows):
-{result_sample}
-
-Please provide a short, clear, and human-readable answer based on the result. If the result is a table, summarize what it shows.
-"""
-    try:
-        chat_summary = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a data assistant. Summarize results from a CSV/SQL query for a user, briefly and clearly."},
-                {"role": "user", "content": summarize_prompt}
-            ],
-            temperature=0.3
-        )
-        summary = chat_summary.choices[0].message.content.strip()
-    except Exception as e:
-        logging.error(f"OpenAI CSV result summary error: {e}")
-        return f"Sorry, I couldn't process your request... (CSV LLM Error - Result Summary)"
-    
-    return summary
-
 
 def load_session_history(session_id: str) -> List[Tuple[str, str, str]]:
     if not os.path.exists(SESSION_FILE):

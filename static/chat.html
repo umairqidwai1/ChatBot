@@ -1,292 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chatbot</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>YQ Answers</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
+    :root {
+      --bg: #202124;
+      --fg: #e8eaed;
+      --user-bubble: #343541;
+      --input-bg: #40414f;
+      --placeholder: #8a8f98;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body { height:100%; overflow:hidden; }
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f7fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .chat-container {
-      width: 90%;
-      height: 95%;
-      background-color: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      background: var(--bg);
+      color: var(--fg);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
-    .chat-header {
-      background-color: #202123;
-      color: white;
-      text-align: center;
-      padding: 16px;
-      font-weight: 600;
-      font-size: 18px;
-    }
-    .chat-messages {
-      flex: 1;
-      padding: 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      scroll-behavior: smooth;
-    }
-    .chat-message {
-      display: flex;
-      align-items: flex-end;
-      margin-bottom: 10px;
-    }
-    .chat-message.user {
-      flex-direction: row-reverse;
-    }
-    .chat-bubble {
-      padding: 10px 14px;
-      border-radius: 18px;
-      max-width: 75%;
-      font-size: 15px;
-      line-height: 1.4;
-      animation: fadeIn 0.3s ease-in;
-    }
-    .user .chat-bubble {
-      background-color: #0a84ff;
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-    .bot .chat-bubble {
-      background-color: #f0f0f0;
-      color: #111;
-      border-bottom-left-radius: 4px;
-    }
-    .avatar {
-      width: 36px;
-      height: 36px;
-      margin: 0 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: #444;
-    }
-    .chat-input {
-      display: flex;
-      padding: 16px;
-      background-color: #f8f9fb;
-      box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
-    }
-    .chat-input input {
-      flex: 1;
-      padding: 12px 16px;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      outline: none;
-      background-color: #fff;
-      margin-right: 10px;
-    }
-    .chat-input button {
-      background-color: #0a84ff;
-      color: white;
-      border: none;
-      font-size: 16px;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .typing span {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      margin: 0 2px;
-      background-color: #bbb;
-      border-radius: 50%;
-      animation: blink 1.4s infinite both;
-    }
-    .file-upload-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #444;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-    .typing span:nth-child(2) { animation-delay: 0.2s; }
-    .typing span:nth-child(3) { animation-delay: 0.4s; }
 
-    @keyframes blink {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
+    /* Header */
+    header {
+      padding: 16px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 500;
+      background: var(--bg);
+      border-bottom: 1px solid #3c4043;
+      flex-shrink: 0;
+    }
+
+    /* Chat area, centered with max-width */
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 640px;         /* controls left/right gap */
+      padding: 16px 0 160px;    /* bottom padding for input */
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      opacity: 0;
+    }
+    body.moved #chat {
+      animation: fadeIn 0.4s ease forwards;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Bubbles that wrap at the chat width */
+    .message {
+      max-width: 100%;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+    .user {
+      align-self: flex-end;
+      background: var(--user-bubble);
+      padding: 10px 14px;
+      border-radius: 14px;
+    }
+    .bot {
+      align-self: flex-start;
+    }
+
+    /* Input wrapper slides down but never full width */
+    #input-wrapper {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 640px;         /* same as #chat */
+      transition: bottom 0.4s ease, transform 0.4s ease;
+      z-index: 10;
+    }
+    body.initial #input-wrapper {
+      bottom: 45%;              /* slightly below center */
+    }
+    body.moved #input-wrapper {
+      position: fixed;
+      bottom: 60px;             /* leaves 60px gap at bottom */
+      transform: translateX(-50%);
+    }
+
+    /* Disclaimer inside the same wrapper */
+    #disclaimer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--placeholder);
+      margin-bottom: 8px;
+    }
+
+    /* Auto‐resizing text area */
+    #messageInput {
+      width: 100%;
+      min-height: 48px;
+      max-height: 200px;
+      background: var(--input-bg);
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: 16px;
+      color: var(--fg);
+      outline: none;
+      line-height: 1.4;
+      resize: none;
+      overflow: hidden;
+    }
+    #messageInput::placeholder {
+      color: var(--placeholder);
     }
   </style>
 </head>
-<body>
-  <div class="chat-container">
-    <div class="chat-header">Chat with AssetSonar</div>
-    <div class="chat-messages" id="chat">
-      <div class="chat-message bot">
-        <div class="avatar"><i class="fas fa-robot"></i></div>
-        <div class="chat-bubble">Hello! How can I assist you today?</div>
-      </div>
+<body class="initial">
+  <header>YQ Answers</header>
+
+  <div id="chat"></div>
+
+  <div id="input-wrapper">
+    <div id="disclaimer">
+      This can make mistakes, please check attached videos to confirm.
     </div>
-    <div id="fileAttachmentPreview" style="display: none; padding: 8px 16px;">
-      <div style="
-        display: inline-flex;
-        align-items: center;
-        background-color: #eef1f5;
-        border: 1px solid #ccc;
-        border-radius: 16px;
-        padding: 6px 12px;
-        font-size: 13px;
-        color: #333;
-      ">
-        <span id="fileNameDisplay"></span>
-      </div>
-    </div>
-    <div class="chat-input">
-      <input type="file" id="csvFile" accept=".csv,text/csv" style="display: none;" />
-      <label for="csvFile" class="file-upload-icon"><i class="fas fa-paperclip"></i></label>
-      <span id="fileNameDisplay" style="font-size: 12px; color: #555; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
-      <input type="text" id="messageInput" placeholder="Type your message..." />
-      <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-    </div>
+    <textarea
+      id="messageInput"
+      placeholder="Ask anything… (Shift+Enter for newline)"
+      autocomplete="off"
+      rows="1"
+    ></textarea>
   </div>
 
   <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("messageInput");
-    // Create a unique session ID every time the page loads
     const sessionId = crypto.randomUUID();
-    // CSV file change listener
-    const fileInput = document.getElementById("csvFile");
-    const filePreview = document.getElementById("fileAttachmentPreview");
-    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const inputEl   = document.getElementById('messageInput');
+    const chatEl    = document.getElementById('chat');
+    let first       = true;
 
-    fileInput.addEventListener("change", function () {
-      if (this.files.length > 0) {
-        fileNameDisplay.textContent = this.files[0].name;
-        filePreview.style.display = "block";
-      } else {
-        filePreview.style.display = "none";
-      }
-    });
-
-    function removeAttachedFile() {
-      fileInput.value = ""; // Clear file input
-      filePreview.style.display = "none";
+    function adjustHeight(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
     }
+    inputEl.addEventListener('input', () => adjustHeight(inputEl));
 
-
-    input.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") sendMessage();
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
     });
 
     async function sendMessage() {
-      const message = input.value.trim();
-      if (!message) return;
+      const text = inputEl.value.trim();
+      if (!text) return;
 
-      const fileInput = document.getElementById("csvFile");
+      if (first) {
+        document.body.classList.replace('initial','moved');
+        first = false;
+      }
 
-      // User message UI
-      const userMsg = document.createElement("div");
-      userMsg.className = "chat-message user";
-      userMsg.innerHTML = `
-        <div class="avatar"><i class="fas fa-user"></i></div>
-        <div class="chat-bubble">${message}</div>
-      `;
-      chat.appendChild(userMsg);
-      input.value = "";
-      chat.scrollTop = chat.scrollHeight;
+      // user bubble
+      const userDiv = document.createElement('div');
+      userDiv.className = 'message user';
+      userDiv.textContent = text;
+      chatEl.appendChild(userDiv);
 
-      // Loading animation
-      const loadingMsg = document.createElement("div");
-      loadingMsg.className = "chat-message bot";
-      loadingMsg.id = "loadingMsg";
-      loadingMsg.innerHTML = `
-        <div class="avatar"><i class="fas fa-robot"></i></div>
-        <div class="chat-bubble typing">
-          <span></span><span></span><span></span>
-        </div>
-      `;
-      chat.appendChild(loadingMsg);
-      chat.scrollTop = chat.scrollHeight;
+      inputEl.value = '';
+      adjustHeight(inputEl);
+      scrollDown();
+
+      // loading indicator
+      const loadDiv = document.createElement('div');
+      loadDiv.className = 'message bot';
+      loadDiv.id        = 'loading';
+      loadDiv.textContent = '…';
+      chatEl.appendChild(loadDiv);
+      scrollDown();
 
       try {
-        let response;
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Session-ID': sessionId,
+            'X-API-Key': '7JgWIdoXs2OrdlouISFDWbE4Pbh6T8apBYgoiXyX7NA'
+          },
+          body: JSON.stringify({ query: text })
+        });
+        const data = await res.json();
+        loadDiv.remove();
 
-        if (fileInput.files.length > 0) {
-          const formData = new FormData();
-          formData.append("query", message);
-          formData.append("file", fileInput.files[0]);
-          response = await fetch("/csv-query", {
-            method: "POST",
-            headers: {
-              "Session-ID": sessionId,
-              "X-API-Key": "7JgWIdoXs2OrdlouISFDWbE4Pbh6T8apBYgoiXyX7NA"
-            },
-            body: formData
-          });
-        } else {
-          response = await fetch("/chat", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Session-ID": sessionId,
-              "X-API-Key": "7JgWIdoXs2OrdlouISFDWbE4Pbh6T8apBYgoiXyX7NA"
-            },
-            body: JSON.stringify({ query: message })
-          });
-        }
-
-        const data = await response.json();
-        loadingMsg.remove();
-
-        let answer;
-        if (response.ok) {
-          answer = data.answer;
-        } else if (data && data.detail) {
-          answer = data.detail;
-        } else {
-          answer = "Something went wrong. Please try again.";
-        }
-
-        const botMsg = document.createElement("div");
-        botMsg.className = "chat-message bot";
-        botMsg.innerHTML = `
-          <div class="avatar"><i class="fas fa-robot"></i></div>
-          <div class="chat-bubble">${marked.parse(answer)}</div>
-        `;
-        chat.appendChild(botMsg);
-        chat.scrollTop = chat.scrollHeight;
-      } catch (err) {
-        loadingMsg.remove();
-        const botMsg = document.createElement("div");
-        botMsg.className = "chat-message bot";
-        botMsg.innerHTML = `
-          <div class="avatar"><i class="fas fa-robot"></i></div>
-          <div class="chat-bubble">Something went wrong. Please try again later.</div>
-        `;
-        chat.appendChild(botMsg);
-        chat.scrollTop = chat.scrollHeight;
+        const botDiv = document.createElement('div');
+        botDiv.className = 'message bot';
+        botDiv.innerHTML = marked.parse(res.ok ? data.answer : (data.detail || 'Something went wrong.'));
+        chatEl.appendChild(botDiv);
+        scrollDown();
+      } catch {
+        loadDiv.remove();
+        const errDiv = document.createElement('div');
+        errDiv.className = 'message bot';
+        errDiv.textContent = 'Something went wrong. Please try again later.';
+        chatEl.appendChild(errDiv);
+        scrollDown();
       }
+    }
+
+    function scrollDown() {
+      setTimeout(() => {
+        chatEl.scrollTop = chatEl.scrollHeight;
+      }, 0);
     }
   </script>
 </body>
