@@ -1,0 +1,144 @@
+2025-06-12 16:06:10,328 [INFO] Fetching all recognizers for language en
+2025-06-12 16:06:11,878 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:06:26,185 [INFO] Fetching all recognizers for language en
+2025-06-12 16:06:26,396 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:06:29,087 [INFO] Fetching all recognizers for language en
+2025-06-12 16:06:29,651 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:08:06,445 [INFO] Fetching all recognizers for language en
+2025-06-12 16:08:07,783 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:08:11,834 [INFO] Fetching all recognizers for language en
+2025-06-12 16:08:11,992 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:08:28,815 [INFO] Fetching all recognizers for language en
+2025-06-12 16:08:29,055 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:10:22,182 [INFO] Fetching all recognizers for language en
+2025-06-12 16:10:23,963 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:11:54,034 [INFO] Fetching all recognizers for language en
+2025-06-12 16:11:56,520 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:21:18,218 [INFO] Fetching all recognizers for language en
+2025-06-12 16:21:18,895 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:28:24,149 [INFO] Fetching all recognizers for language en
+2025-06-12 16:28:31,034 [INFO] Fetching all recognizers for language en
+2025-06-12 16:30:49,567 [INFO] Fetching all recognizers for language en
+2025-06-12 16:30:50,273 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:32:39,929 [INFO] Fetching all recognizers for language en
+2025-06-12 16:32:40,773 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:37:01,991 [INFO] Fetching all recognizers for language en
+2025-06-12 16:37:03,577 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:50:53,564 [INFO] Fetching all recognizers for language en
+2025-06-12 16:50:54,356 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 16:58:20,910 [INFO] Fetching all recognizers for language en
+2025-06-12 16:58:21,638 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2025-06-12 18:09:12,622 [INFO] Fetching all recognizers for language en
+2025-06-12 18:09:13,729 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:09:15,430 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:09:15,871 [INFO] Fetching all recognizers for language en
+2025-06-12 18:09:18,525 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:09:20,407 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:09:20,690 [INFO] Fetching all recognizers for language en
+2025-06-12 18:09:21,079 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:09:21,920 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:09:22,355 [INFO] Fetching all recognizers for language en
+2025-06-12 18:09:22,780 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:09:24,049 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:09:56,591 [INFO] Fetching all recognizers for language en
+2025-06-12 18:09:56,852 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:09:59,181 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:09:59,624 [INFO] Fetching all recognizers for language en
+2025-06-12 18:10:00,220 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:10:01,931 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:10:02,647 [INFO] Fetching all recognizers for language en
+2025-06-12 18:10:02,961 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:10:03,656 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:10:04,058 [INFO] Fetching all recognizers for language en
+2025-06-12 18:10:04,320 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:10:05,275 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:10:26,613 [INFO] Fetching all recognizers for language en
+2025-06-12 18:10:26,948 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:10:30,505 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:10:31,000 [INFO] Fetching all recognizers for language en
+2025-06-12 18:10:31,440 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:10:33,749 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:11:08,570 [INFO] Fetching all recognizers for language en
+2025-06-12 18:11:09,013 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:11:09,609 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:11:10,142 [INFO] Fetching all recognizers for language en
+2025-06-12 18:11:10,597 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:11:12,556 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:11:12,869 [INFO] Fetching all recognizers for language en
+2025-06-12 18:11:13,352 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:11:21,482 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:11:22,059 [INFO] Fetching all recognizers for language en
+2025-06-12 18:11:22,356 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:11:23,225 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:17:19,851 [INFO] Fetching all recognizers for language en
+2025-06-12 18:17:20,839 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:17:24,276 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:17:24,809 [INFO] Fetching all recognizers for language en
+2025-06-12 18:17:25,341 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:17:27,595 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:17:28,004 [INFO] Fetching all recognizers for language en
+2025-06-12 18:17:28,406 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:17:29,272 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:17:29,683 [INFO] Fetching all recognizers for language en
+2025-06-12 18:17:30,130 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:17:31,222 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:19:30,919 [INFO] Fetching all recognizers for language en
+2025-06-12 18:19:31,173 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:19:32,474 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:19:34,899 [INFO] Fetching all recognizers for language en
+2025-06-12 18:19:35,287 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:19:36,021 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:21:11,282 [INFO] Fetching all recognizers for language en
+2025-06-12 18:21:12,169 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:21:16,749 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:21:17,176 [INFO] Fetching all recognizers for language en
+2025-06-12 18:21:17,513 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:21:19,730 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:21:20,095 [INFO] Fetching all recognizers for language en
+2025-06-12 18:21:20,483 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:21:21,595 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:21:22,275 [INFO] Fetching all recognizers for language en
+2025-06-12 18:21:22,616 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:21:23,404 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:13,384 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:13,806 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:15,339 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:15,920 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:16,400 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:18,907 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:19,023 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:19,299 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:20,010 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:20,015 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:20,353 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:21,033 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:21,329 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:21,713 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:24,167 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:24,297 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:24,679 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:25,457 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:31,269 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:31,551 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:32,327 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:32,759 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:33,094 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:35,801 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:50,984 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:51,289 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:56,580 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:22:56,858 [INFO] Fetching all recognizers for language en
+2025-06-12 18:22:57,481 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:22:59,796 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:27:17,308 [INFO] Fetching all recognizers for language en
+2025-06-12 18:27:18,306 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:27:21,054 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:27:22,076 [INFO] Fetching all recognizers for language en
+2025-06-12 18:27:22,570 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:27:24,278 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:27:24,739 [INFO] Fetching all recognizers for language en
+2025-06-12 18:27:25,191 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:27:25,877 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-12 18:27:26,247 [INFO] Fetching all recognizers for language en
+2025-06-12 18:27:26,619 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-06-12 18:27:27,777 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
