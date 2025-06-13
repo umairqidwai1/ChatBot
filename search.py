@@ -110,7 +110,9 @@ def answer_query(messages: List[dict]) -> str:
         text = r.get("text", "")
         if link:
             start_sec = extract_start_sec(text)
-            sources.append(f"[Watch here]({link}&t={start_sec})")
+            title = r.get("Title", "Video Link")
+            sources.append(f"[{title}]({link}&t={start_sec})")
+            
 
 
     system_prompt = """
@@ -143,7 +145,8 @@ def answer_query(messages: List[dict]) -> str:
         return "Sorry, I couldn't process your request... (Backend Error - LLM)"
 
     if sources:
-        answer += "\n\n**Sources:**\n" + "\n".join(f"- {link}" for link in sources)
+        inline, footnotes = format_citations(sources)
+        answer = f"{answer} {inline}\n{footnotes}"
 
     # Log the exchange
     log_exchange(user_message, context, answer)
@@ -155,3 +158,9 @@ def log_exchange(question: str, context: str, answer: str) -> None:
     import csv
     with open(HISTORY_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([question, context, answer])
+
+def format_citations(urls: list[str]) -> tuple[str, str]:
+    if not urls:
+        return "", ""
+    footer = "\n\n**Sources:**\n" + "\n".join(f"- {url}" for url in urls)
+    return "", footer

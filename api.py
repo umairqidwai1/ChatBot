@@ -1,12 +1,22 @@
 import os
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
+from fastapi.security.api_key import APIKeyHeader
 from search import answer_query
 from typing import List
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Security
 import traceback
 
-app = FastAPI()
+#Authentication setup
+API_KEY = os.getenv("CHAT_API_KEY")
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+async def get_api_key(api_key: str = Security(api_key_header)):
+    if api_key == API_KEY:
+        return api_key
+    raise HTTPException(status_code=403, detail="Could not validate credentials")
+
+app = FastAPI(dependencies=[Depends(get_api_key)])
 
 # === OpenAI-compatible chat/completions endpoint ===
 class ChatMessage(BaseModel):
